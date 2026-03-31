@@ -241,7 +241,7 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
     <div class="page-header">
       <div>
         <div class="page-title">Add-Ons</div>
-        <div class="page-subtitle">Manage features included in your plan. Enabling or disabling won&#8217;t affect your billing.</div>
+        <div class="page-subtitle" id="pageSubtitle">Manage features included in your plan. Enabling or disabling won&#8217;t affect your billing.</div>
       </div>
       <div class="plan-badge plan-badge-growth" id="planBadge">
         <svg width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -583,7 +583,7 @@ const PLAN_CONFIG = {
 // Default add-on states per plan
 // true = active, false = disabled, 'setup' = included but needs setup
 const PLAN_DEFAULTS = {
-  growth:   { sms: 'setup', production: 'setup', jobcosting: 'setup', jobi: 'setup' },
+  growth:   { sms: 'setup', production: false, jobcosting: false, jobi: false },
   scale:    { sms: true,    production: true,  jobcosting: true, jobi: true  },
   advanced: { sms: true,    production: false, jobcosting: true, jobi: false }
 };
@@ -619,6 +619,11 @@ function switchPlan(planId) {
   currentPlan = planId;
   // Load default states for this plan
   STATE = Object.assign({}, PLAN_DEFAULTS[planId]);
+
+  // Update page subtitle
+  document.getElementById('pageSubtitle').textContent = planId === 'advanced'
+    ? 'Manage features. Enabling or disabling will update your billing accordingly.'
+    : 'Manage features included in your plan. Enabling or disabling won\u2019t affect your billing.';
 
   // Update plan badge
   const cfg = PLAN_CONFIG[planId];
