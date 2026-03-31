@@ -63,6 +63,8 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
 
 /* ── CARDS GRID ── */
 .cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.cards-section-label{grid-column:1/-1;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);padding-bottom:2px;}
+.cards-section-divider{grid-column:1/-1;height:1px;background:var(--gray-200);margin:6px 0;}
 
 /* ── CARD ── */
 .addon-card{background:#fff;border-radius:var(--radius);border:2px solid var(--gray-200);box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;padding-top:18px;transition:border-color .25s,box-shadow .25s;}
@@ -259,6 +261,9 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
     <!-- Cards Grid -->
     <div class="cards-grid">
 
+      <!-- Section 1 label -->
+      <div class="cards-section-label" id="labelSection1">Included with your Growth Plan</div>
+
       <!-- SMS / Text Messaging -->
       <div class="addon-card" id="card-sms">
         <div class="card-ribbon" id="ribbon-sms"></div>
@@ -304,6 +309,53 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
           <a class="card-learn-more" onclick="openModal('sms')">Learn more &#8594;</a>
         </div>
       </div>
+
+      <!-- Job Costing (grouped with SMS under "Included") -->
+      <div class="addon-card" id="card-jobcosting">
+        <div class="card-ribbon" id="ribbon-jobcosting"></div>
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#EDE9FE"/>
+            <!-- Diagonal arrow behind circle -->
+            <line x1="14" y1="35" x2="36" y2="12" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round"/>
+            <!-- Arrowhead at top-right -->
+            <path d="M29.5,11 L37,11 L37,18.5" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <!-- Dollar circle (EDE9FE fill covers the arrow inside) -->
+            <circle cx="19" cy="26" r="11" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
+            <!-- Dollar vertical line -->
+            <line x1="19" y1="19.5" x2="19" y2="32.5" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round"/>
+            <!-- Dollar S-curve -->
+            <path d="M16.5,22.5 Q16.5,20.5 19,20.5 Q21.5,20.5 21.5,22.5 Q21.5,24 19,24.5 Q16.5,25 16.5,27 Q16.5,29.5 19,29.5 Q21.5,29.5 21.5,27.5" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Job Costing</div>
+            <div class="card-subtitle">Track Expenses &amp; Profitability</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-description">Simplifies monitoring of labor and project expenses, facilitating seamless calculation of job profitability so you always know where you stand on every job.</p>
+        </div>
+        <div class="card-footer">
+          <div class="cost-row">
+            <span class="cost-label">Monthly cost</span>
+            <span class="price-amount" id="price-jobcosting">$0</span>
+            <span class="price-unit">/ mo</span>
+            <span class="included-badge" id="badge-jobcosting">&#10003; Included</span>
+          </div>
+          <div class="billing-note" id="billing-jobcosting">Enabling or disabling won&#8217;t affect your billing.</div>
+          <div class="lock-msg is-hidden" id="lock-jobcosting">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            This add-on is included in your monthly plan and cannot be removed.
+          </div>
+          <button type="button" class="btn btn-disable" id="btn-jobcosting" onclick="toggleAddon('jobcosting')">Disable</button>
+          <a class="card-learn-more" onclick="openModal('jobcosting')">Learn more &#8594;</a>
+        </div>
+      </div>
+
+      <!-- Divider + Section 2 label -->
+      <div class="cards-section-divider" id="sectionDivider"></div>
+      <div class="cards-section-label" id="labelSection2">Additional Add-Ons</div>
 
       <!-- Production Rates -->
       <div class="addon-card" id="card-production">
@@ -351,51 +403,8 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             This add-on is included in your monthly plan and cannot be removed.
           </div>
-          <button type="button" class="btn btn-disable" id="btn-production" onclick="toggleAddon('production')">Disable</button>
+          <button type="button" class="btn btn-enable" id="btn-production" onclick="toggleAddon('production')">Enable Production Rates</button>
           <a class="card-learn-more" onclick="openModal('production')">Learn more &#8594;</a>
-        </div>
-      </div>
-
-      <!-- Job Costing -->
-      <div class="addon-card" id="card-jobcosting">
-        <div class="card-ribbon" id="ribbon-jobcosting"></div>
-        <div class="card-header">
-          <div class="card-icon">
-            <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#EDE9FE"/>
-            <!-- Diagonal arrow behind circle -->
-            <line x1="14" y1="35" x2="36" y2="12" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round"/>
-            <!-- Arrowhead at top-right -->
-            <path d="M29.5,11 L37,11 L37,18.5" stroke="#7C3AED" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <!-- Dollar circle (EDE9FE fill covers the arrow inside) -->
-            <circle cx="19" cy="26" r="11" fill="#EDE9FE" stroke="#7C3AED" stroke-width="2"/>
-            <!-- Dollar vertical line -->
-            <line x1="19" y1="19.5" x2="19" y2="32.5" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round"/>
-            <!-- Dollar S-curve -->
-            <path d="M16.5,22.5 Q16.5,20.5 19,20.5 Q21.5,20.5 21.5,22.5 Q21.5,24 19,24.5 Q16.5,25 16.5,27 Q16.5,29.5 19,29.5 Q21.5,29.5 21.5,27.5" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-            </svg>
-          </div>
-          <div>
-            <div class="card-title">Job Costing</div>
-            <div class="card-subtitle">Track Expenses &amp; Profitability</div>
-          </div>
-        </div>
-        <div class="card-body">
-          <p class="card-description">Simplifies monitoring of labor and project expenses, facilitating seamless calculation of job profitability so you always know where you stand on every job.</p>
-        </div>
-        <div class="card-footer">
-          <div class="cost-row">
-            <span class="cost-label">Monthly cost</span>
-            <span class="price-amount" id="price-jobcosting">$0</span>
-            <span class="price-unit">/ mo</span>
-            <span class="included-badge" id="badge-jobcosting">&#10003; Included</span>
-          </div>
-          <div class="billing-note" id="billing-jobcosting">Enabling or disabling won&#8217;t affect your billing.</div>
-          <div class="lock-msg is-hidden" id="lock-jobcosting">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            This add-on is included in your monthly plan and cannot be removed.
-          </div>
-          <button type="button" class="btn btn-disable" id="btn-jobcosting" onclick="toggleAddon('jobcosting')">Disable</button>
-          <a class="card-learn-more" onclick="openModal('jobcosting')">Learn more &#8594;</a>
         </div>
       </div>
 
@@ -619,6 +628,26 @@ function switchPlan(planId) {
   currentPlan = planId;
   // Load default states for this plan
   STATE = Object.assign({}, PLAN_DEFAULTS[planId]);
+
+  // Update section labels
+  const label1   = document.getElementById('labelSection1');
+  const label2   = document.getElementById('labelSection2');
+  const divider  = document.getElementById('sectionDivider');
+  if (planId === 'growth') {
+    label1.textContent = 'Included with your Growth Plan';
+    label1.classList.remove('is-hidden');
+    divider.classList.remove('is-hidden');
+    label2.classList.remove('is-hidden');
+  } else if (planId === 'scale') {
+    label1.textContent = 'Included with your Scale Plan';
+    label1.classList.remove('is-hidden');
+    divider.classList.add('is-hidden');
+    label2.classList.add('is-hidden');
+  } else {
+    label1.classList.add('is-hidden');
+    divider.classList.add('is-hidden');
+    label2.classList.add('is-hidden');
+  }
 
   // Update page subtitle
   document.getElementById('pageSubtitle').textContent = planId === 'advanced'
