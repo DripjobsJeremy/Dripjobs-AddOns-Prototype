@@ -111,8 +111,11 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
 .btn-disable{background:transparent;color:var(--gray-600);border:1.5px solid var(--gray-300);}
 .btn-disable:hover:not(:disabled){background:var(--gray-50);border-color:var(--gray-400);}
 .btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important;}
+.card-actions-row{display:flex;align-items:center;justify-content:space-between;}
 .card-learn-more{font-size:12px;font-weight:700;color:var(--purple);cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:color .15s;}
 .card-learn-more:hover{color:var(--purple-dark);text-decoration:underline;}
+.card-demo-link{font-size:12px;font-weight:700;color:var(--teal-dark);display:inline-flex;align-items:center;gap:3px;transition:color .15s;text-decoration:none;}
+.card-demo-link:hover{color:var(--teal);text-decoration:underline;}
 
 /* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(17,24,39,.50);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;}
@@ -354,7 +357,10 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
             This add-on is included in your monthly plan and cannot be removed.
           </div>
           <button type="button" class="btn btn-disable" id="btn-jobcosting" onclick="toggleAddon('jobcosting')">Disable</button>
-          <a class="card-learn-more" onclick="openModal('jobcosting')">Learn more &#8594;</a>
+          <div class="card-actions-row">
+            <a class="card-learn-more" onclick="openModal('jobcosting')">Learn more &#8594;</a>
+            <a class="card-demo-link" href="https://calendly.com/david-cerro-dripjobs/job-costing-demo" target="_blank" rel="noopener">&#128197; Schedule a Demo</a>
+          </div>
         </div>
       </div>
 
@@ -408,7 +414,10 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
             This add-on is included in your monthly plan and cannot be removed.
           </div>
           <button type="button" class="btn btn-enable" id="btn-production" onclick="toggleAddon('production')">Enable Production Rates</button>
-          <a class="card-learn-more" onclick="openModal('production')">Learn more &#8594;</a>
+          <div class="card-actions-row">
+            <a class="card-learn-more" onclick="openModal('production')">Learn more &#8594;</a>
+            <a class="card-demo-link" href="https://calendly.com/alex-calderon-drwk/production-rates-demo" target="_blank" rel="noopener">&#128197; Schedule a Demo</a>
+          </div>
         </div>
       </div>
 
