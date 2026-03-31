@@ -61,10 +61,13 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1);}
 .progress-count{font-size:13px;font-weight:700;color:var(--gray-600);white-space:nowrap;}
 
-/* ── CARDS GRID ── */
-.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
-.cards-section-label{grid-column:1/-1;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);padding-bottom:2px;}
-.cards-section-divider{grid-column:1/-1;height:1px;background:var(--gray-200);margin:6px 0;}
+/* ── CARDS LAYOUT ── */
+.cards-labels-row{display:flex;align-items:center;gap:18px;margin-bottom:10px;}
+.group-label{flex:1;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500);}
+.label-divider-spacer{width:19px;flex-shrink:0;}
+.cards-flex{display:flex;align-items:stretch;gap:18px;}
+.cards-flex .addon-card{flex:1;min-width:0;}
+.vertical-divider{width:1px;background:var(--gray-200);margin:0 -9px;flex-shrink:0;}
 
 /* ── CARD ── */
 .addon-card{background:#fff;border-radius:var(--radius);border:2px solid var(--gray-200);box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;padding-top:18px;transition:border-color .25s,box-shadow .25s;}
@@ -258,11 +261,13 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
       <div class="progress-count" id="progressCount"></div>
     </div>
 
-    <!-- Cards Grid -->
-    <div class="cards-grid">
-
-      <!-- Section 1 label -->
-      <div class="cards-section-label" id="labelSection1">Included with your Growth Plan</div>
+    <!-- Cards Layout -->
+    <div class="cards-labels-row" id="labelsRow">
+      <div class="group-label" id="labelSection1">Included with your Growth Plan</div>
+      <div class="label-divider-spacer" id="labelDividerSpacer"></div>
+      <div class="group-label" id="labelSection2">Additional Add-Ons</div>
+    </div>
+    <div class="cards-flex">
 
       <!-- SMS / Text Messaging -->
       <div class="addon-card" id="card-sms">
@@ -353,9 +358,8 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
         </div>
       </div>
 
-      <!-- Divider + Section 2 label -->
-      <div class="cards-section-divider" id="sectionDivider"></div>
-      <div class="cards-section-label" id="labelSection2">Additional Add-Ons</div>
+      <!-- Vertical divider between groups -->
+      <div class="vertical-divider" id="sectionDivider"></div>
 
       <!-- Production Rates -->
       <div class="addon-card" id="card-production">
@@ -630,23 +634,26 @@ function switchPlan(planId) {
   STATE = Object.assign({}, PLAN_DEFAULTS[planId]);
 
   // Update section labels
-  const label1   = document.getElementById('labelSection1');
-  const label2   = document.getElementById('labelSection2');
-  const divider  = document.getElementById('sectionDivider');
+  const labelsRow  = document.getElementById('labelsRow');
+  const label1     = document.getElementById('labelSection1');
+  const label2     = document.getElementById('labelSection2');
+  const spacer     = document.getElementById('labelDividerSpacer');
+  const divider    = document.getElementById('sectionDivider');
   if (planId === 'growth') {
     label1.textContent = 'Included with your Growth Plan';
-    label1.classList.remove('is-hidden');
-    divider.classList.remove('is-hidden');
+    labelsRow.classList.remove('is-hidden');
     label2.classList.remove('is-hidden');
+    spacer.classList.remove('is-hidden');
+    divider.classList.remove('is-hidden');
   } else if (planId === 'scale') {
     label1.textContent = 'Included with your Scale Plan';
-    label1.classList.remove('is-hidden');
-    divider.classList.add('is-hidden');
+    labelsRow.classList.remove('is-hidden');
     label2.classList.add('is-hidden');
+    spacer.classList.add('is-hidden');
+    divider.classList.add('is-hidden');
   } else {
-    label1.classList.add('is-hidden');
+    labelsRow.classList.add('is-hidden');
     divider.classList.add('is-hidden');
-    label2.classList.add('is-hidden');
   }
 
   // Update page subtitle
