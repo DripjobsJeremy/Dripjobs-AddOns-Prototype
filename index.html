@@ -142,6 +142,18 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
 .modal-btn-disable:hover{background:var(--red-light);}
 .modal-btn-locked{background:var(--gray-100);color:var(--gray-400);border:1.5px solid var(--gray-200);cursor:not-allowed;}
 
+/* ── CONFIRM MODAL ── */
+#confirmOverlay{z-index:1100;}
+.confirm-modal{max-width:380px;text-align:center;padding:36px 32px 28px;}
+.confirm-icon{width:68px;height:68px;border-radius:50%;background:#FEF3C7;border:2px solid #F59E0B;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:30px;color:#D97706;}
+.confirm-title{font-size:20px;font-weight:800;color:var(--gray-900);margin-bottom:12px;}
+.confirm-body{font-size:13.5px;color:var(--gray-600);line-height:1.65;margin-bottom:24px;}
+.confirm-footer{display:flex;gap:10px;justify-content:center;}
+.confirm-btn-yes{background:#F59E0B;color:#fff;border:none;padding:10px 22px;border-radius:8px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;}
+.confirm-btn-yes:hover{background:#D97706;}
+.confirm-btn-cancel{background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-300);padding:10px 22px;border-radius:8px;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;}
+.confirm-btn-cancel:hover{background:var(--gray-50);}
+
 /* ── TOAST ── */
 .toast-container{position:fixed;bottom:calc(var(--demo-bar-h) + 12px);left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;}
 .toast{background:var(--gray-900);color:#fff;padding:12px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s;white-space:nowrap;max-width:420px;}
@@ -477,6 +489,19 @@ body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-
   </div>
 </div>
 
+<!-- ═══════ CONFIRM MODAL ═══════ -->
+<div class="modal-overlay" id="confirmOverlay" onclick="handleConfirmOverlayClick(event)">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon">!</div>
+    <div class="confirm-title">Are you sure?</div>
+    <p class="confirm-body">By removing the <strong id="confirmAddonName"></strong> add-on you will <strong>immediately lose access</strong> to all related features and settings. You will be refunded any unused time according to your billing cycle. This action cannot be undone.</p>
+    <div class="confirm-footer">
+      <button type="button" class="confirm-btn-yes" onclick="confirmDisable()">Yes, remove it!</button>
+      <button type="button" class="confirm-btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════ DEMO BAR ═══════ -->
 <div class="demo-bar">
   <div class="demo-left">
@@ -558,7 +583,7 @@ const PLAN_CONFIG = {
 // Default add-on states per plan
 // true = active, false = disabled, 'setup' = included but needs setup
 const PLAN_DEFAULTS = {
-  growth:   { sms: 'setup', production: false, jobcosting: true, jobi: false },
+  growth:   { sms: 'setup', production: 'setup', jobcosting: 'setup', jobi: 'setup' },
   scale:    { sms: true,    production: true,  jobcosting: true, jobi: true  },
   advanced: { sms: true,    production: false, jobcosting: true, jobi: false }
 };
@@ -579,6 +604,12 @@ function isIncluded(id) {
 
 function isLocked(id) {
   return false;
+}
+
+function getBillingNote(id) {
+  if (currentPlan === 'advanced') return 'Enabling or disabling it will update your billing accordingly.';
+  if (isIncluded(id)) return 'Enabling or disabling won\u2019t affect your billing.';
+  return 'Billed in addition to your regular subscription.';
 }
 
 // ─────────────────────────────────────────────
@@ -647,6 +678,7 @@ function renderCard(id) {
   // Lock message vs billing note
   const lockEl    = document.getElementById('lock-' + id);
   const billingEl = document.getElementById('billing-' + id);
+  billingEl.textContent = getBillingNote(id);
   if (locked) {
     lockEl.classList.remove('is-hidden');
     billingEl.classList.add('is-hidden');
@@ -693,6 +725,11 @@ function renderCard(id) {
 function toggleAddon(id) {
   if (isLocked(id)) {
     showToast('This add-on is included in your plan and cannot be removed.', 'warning');
+    return;
+  }
+
+  if (currentPlan === 'advanced' && STATE[id] === true) {
+    openConfirmModal(id);
     return;
   }
 
@@ -801,8 +838,47 @@ function handleOverlayClick(e) {
 function modalAction() {
   const id = currentModalAddon;
   if (!id || isLocked(id)) return;
+  if (currentPlan === 'advanced' && STATE[id] === true) {
+    openConfirmModal(id);
+    return;
+  }
   closeModal();
   setTimeout(() => toggleAddon(id), 150);
+}
+
+// ─────────────────────────────────────────────
+// CONFIRM MODAL (Advanced plan disable)
+// ─────────────────────────────────────────────
+let pendingDisableId = null;
+
+function openConfirmModal(id) {
+  pendingDisableId = id;
+  document.getElementById('confirmAddonName').textContent = ADDONS[id].name;
+  document.getElementById('confirmOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeConfirmModal() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  if (!currentModalAddon) document.body.style.overflow = '';
+  pendingDisableId = null;
+}
+
+function handleConfirmOverlayClick(e) {
+  if (e.target === document.getElementById('confirmOverlay')) closeConfirmModal();
+}
+
+function confirmDisable() {
+  const id = pendingDisableId;
+  closeConfirmModal();
+  closeModal();
+  if (!id) return;
+  setTimeout(() => {
+    STATE[id] = false;
+    showToast(ADDONS[id].name + ' disabled.', 'info');
+    renderCard(id);
+    updateProgress();
+  }, 150);
 }
 
 // ─────────────────────────────────────────────
