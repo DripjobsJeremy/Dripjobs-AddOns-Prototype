@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DripJobs — Add-Ons Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:#7C3AED; --purple-light:#EDE9FE; --purple-mid:#DDD6FE; --purple-dark:#5B21B6;
+  --teal:#0DCECE; --teal-dark:#0aa8a8; --teal-light:#f0fafa;
+  --green:#10B981; --green-light:#D1FAE5; --green-dark:#059669;
+  --red:#DC2626; --red-light:#FEF2F2;
+  --amber:#F59E0B; --amber-light:#FFFBEB; --amber-dark:#B45309;
+  --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB; --gray-300:#D1D5DB;
+  --gray-400:#9CA3AF; --gray-500:#6B7280; --gray-600:#4B5563; --gray-700:#374151;
+  --gray-800:#1F2937; --gray-900:#111827;
+  --sidebar-w:220px; --header-h:60px; --demo-bar-h:54px;
+  --radius:10px; --radius-sm:6px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md:0 4px 12px rgba(0,0,0,0.10);
+  --shadow-lg:0 10px 30px rgba(0,0,0,0.15);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--gray-50);color:var(--gray-800);font-size:14px;display:flex;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:#fff;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;}
+.sidebar-logo{padding:18px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--gray-100);}
+.logo-mark{width:34px;height:34px;background:var(--purple);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;flex-shrink:0;}
+.logo-text{font-weight:800;font-size:15px;color:var(--gray-900);letter-spacing:-0.3px;}
+.sidebar-section{padding:18px 12px 4px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--gray-400);text-transform:uppercase;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);margin:1px 8px;cursor:pointer;font-size:13px;font-weight:600;color:var(--gray-600);transition:background .15s,color .15s;text-decoration:none;}
+.sidebar-item:hover{background:var(--gray-50);color:var(--gray-900);}
+.sidebar-item.active{background:var(--purple-light);color:var(--purple);}
+.sidebar-item svg{flex-shrink:0;opacity:.7;}
+.sidebar-item.active svg{opacity:1;}
+.sidebar-badge{margin-left:auto;background:var(--purple);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center;}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topnav{height:var(--header-h);background:#fff;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:0 28px;position:sticky;top:0;z-index:50;overflow-x:auto;}
+.topnav-tab{padding:0 14px;height:100%;display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--gray-500);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.topnav-tab:hover{color:var(--gray-800);}
+.topnav-tab.active{color:var(--purple);border-bottom-color:var(--purple);}
+
+/* ── PAGE ── */
+.page-content{padding:28px 32px calc(var(--demo-bar-h) + 20px);flex:1;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;}
+.page-title{font-size:18px;font-weight:800;color:var(--gray-900);letter-spacing:0.04em;text-transform:uppercase;}
+.page-subtitle{font-size:13px;color:var(--gray-400);margin-bottom:20px;}
+.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid;white-space:nowrap;}
+.plan-badge-growth{background:var(--purple-light);color:var(--purple-dark);border-color:var(--purple-mid);}
+.plan-badge-scale{background:#FFF7ED;color:#C2410C;border-color:#FED7AA;}
+.plan-badge-advanced{background:var(--gray-100);color:var(--gray-600);border-color:var(--gray-300);}
+
+/* ── PROGRESS ── */
+.progress-container{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:14px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow);}
+.progress-label{font-size:13px;font-weight:600;color:var(--gray-700);white-space:nowrap;min-width:110px;}
+.progress-track{flex:1;height:8px;background:var(--gray-200);border-radius:20px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:20px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.progress-count{font-size:13px;font-weight:700;color:var(--gray-600);white-space:nowrap;}
+
+/* ── CARDS GRID ── */
+.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+
+/* ── CARD ── */
+.addon-card{background:#fff;border-radius:var(--radius);border:2px solid var(--gray-200);box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative;padding-top:18px;transition:border-color .25s,box-shadow .25s;}
+.addon-card.state-active{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,206,206,.10),var(--shadow-md);}
+.addon-card.state-setup{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,.10),var(--shadow-md);}
+.addon-card.state-disabled{border-color:var(--gray-300);}
+
+/* ── CARD RIBBON ── */
+.card-ribbon{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:4px 12px;border-radius:0 0 8px 8px;white-space:nowrap;z-index:2;}
+.ribbon-active{background:var(--teal);color:#fff;}
+.ribbon-setup{background:var(--purple);color:#fff;}
+.ribbon-disabled{background:var(--gray-300);color:var(--gray-600);}
+
+/* ── CARD HEADER ── */
+.card-header{display:flex;align-items:center;gap:12px;padding:14px 18px 12px;}
+.card-icon{width:44px;height:44px;border-radius:10px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;}
+.card-title{font-size:14px;font-weight:800;color:var(--gray-900);line-height:1.2;}
+.card-subtitle{font-size:11px;color:var(--gray-400);font-weight:600;margin-top:2px;line-height:1.3;}
+
+/* ── CARD BODY ── */
+.card-body{padding:0 18px 14px;flex:1;}
+.card-description{font-size:12.5px;color:var(--gray-600);line-height:1.6;}
+
+/* ── CARD FOOTER ── */
+.card-footer{padding:14px 18px 16px;border-top:1px solid var(--gray-100);display:flex;flex-direction:column;gap:8px;}
+.cost-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.cost-label{font-size:11px;font-weight:700;color:var(--gray-500);}
+.price-amount{font-size:14px;font-weight:800;color:var(--gray-900);}
+.price-unit{font-size:11px;font-weight:600;color:var(--gray-400);}
+.included-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;background:var(--green-light);color:var(--green-dark);padding:3px 8px;border-radius:20px;}
+.billing-note{font-size:11px;color:var(--gray-400);font-style:italic;line-height:1.4;}
+
+/* Lock message — shown for included+active add-ons */
+.lock-msg{display:flex;align-items:flex-start;gap:6px;background:#F0F9FF;border:1px solid #BAE6FD;border-radius:6px;padding:8px 10px;font-size:11px;color:#0369A1;font-weight:600;line-height:1.45;}
+.lock-msg svg{flex-shrink:0;margin-top:1px;}
+
+/* ── CARD BUTTONS ── */
+.btn{width:100%;padding:10px 16px;border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-enable{background:var(--purple);color:#fff;}
+.btn-enable:hover:not(:disabled){background:var(--purple-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(124,58,237,.3);}
+.btn-disable{background:transparent;color:var(--gray-600);border:1.5px solid var(--gray-300);}
+.btn-disable:hover:not(:disabled){background:var(--gray-50);border-color:var(--gray-400);}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important;}
+.card-learn-more{font-size:12px;font-weight:700;color:var(--purple);cursor:pointer;display:inline-flex;align-items:center;gap:3px;transition:color .15s;}
+.card-learn-more:hover{color:var(--purple-dark);text-decoration:underline;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(17,24,39,.50);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border-radius:14px;box-shadow:var(--shadow-lg);width:100%;max-width:480px;max-height:90vh;overflow-y:auto;transform:scale(.96) translateY(10px);transition:transform .22s;}
+.modal-overlay.open .modal{transform:scale(1) translateY(0);}
+.modal-header{padding:20px 24px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-100);}
+.modal-title{font-size:18px;font-weight:800;color:var(--gray-900);}
+.modal-close-btn{display:inline-flex;align-items:center;gap:5px;background:var(--gray-100);border:none;border-radius:6px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:var(--gray-500);cursor:pointer;transition:background .15s,color .15s;}
+.modal-close-btn:hover{background:var(--gray-200);color:var(--gray-800);}
+.modal-body{padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+.modal-what-label{font-size:13px;font-weight:800;color:var(--gray-800);}
+.modal-description{font-size:13.5px;color:var(--gray-600);line-height:1.65;margin-top:-8px;}
+.modal-cost-box{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:var(--radius);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;}
+.modal-cost-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.modal-cost-value{font-size:14px;font-weight:800;color:var(--green-dark);margin-bottom:4px;}
+.modal-cost-note{font-size:12.5px;color:var(--green-dark);line-height:1.55;opacity:.9;}
+.modal-cost-note strong{font-weight:900;}
+.modal-setup-box{background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:var(--radius);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;}
+.modal-setup-title{font-size:13px;font-weight:800;color:var(--purple-dark);margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.modal-setup-text{font-size:12.5px;color:var(--purple-dark);line-height:1.55;opacity:.85;}
+.modal-lock-box{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:var(--radius);padding:14px 16px;display:flex;gap:10px;align-items:flex-start;}
+.modal-lock-title{font-size:13px;font-weight:800;color:#0369A1;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+.modal-lock-text{font-size:12.5px;color:#0369A1;line-height:1.55;opacity:.9;}
+.modal-footer{padding:0 24px 20px;display:flex;gap:10px;justify-content:flex-end;}
+.modal-btn{padding:10px 20px;border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;}
+.modal-btn-close{background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-300);}
+.modal-btn-close:hover{background:var(--gray-50);border-color:var(--gray-400);}
+.modal-btn-enable{background:var(--purple);color:#fff;border:none;}
+.modal-btn-enable:hover{background:var(--purple-dark);}
+.modal-btn-disable{background:#fff;color:var(--red);border:1.5px solid var(--red);}
+.modal-btn-disable:hover{background:var(--red-light);}
+.modal-btn-locked{background:var(--gray-100);color:var(--gray-400);border:1.5px solid var(--gray-200);cursor:not-allowed;}
+
+/* ── TOAST ── */
+.toast-container{position:fixed;bottom:calc(var(--demo-bar-h) + 12px);left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;}
+.toast{background:var(--gray-900);color:#fff;padding:12px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s;white-space:nowrap;max-width:420px;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.toast-dot.success{background:var(--green);}
+.toast-dot.info{background:var(--teal);}
+.toast-dot.warning{background:var(--amber);}
+
+/* ── DEMO BAR ── */
+.demo-bar{position:fixed;bottom:0;left:var(--sidebar-w);right:0;background:var(--gray-900);height:var(--demo-bar-h);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:200;gap:16px;}
+.demo-left{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.demo-label{background:var(--purple);color:#fff;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0;}
+.demo-plan-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);white-space:nowrap;}
+.plan-switcher{display:flex;align-items:center;gap:6px;}
+.plan-btn{padding:5px 13px;border-radius:20px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;cursor:pointer;border:1.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);background:transparent;transition:all .18s;white-space:nowrap;}
+.plan-btn:hover{border-color:rgba(255,255,255,.45);color:rgba(255,255,255,.9);}
+.plan-btn.active-growth{border-color:var(--purple);background:var(--purple);color:#fff;}
+.plan-btn.active-scale{border-color:#F97316;background:#F97316;color:#fff;}
+.plan-btn.active-advanced{border-color:var(--gray-500);background:var(--gray-600);color:#fff;}
+.demo-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.demo-divider{width:1px;height:20px;background:rgba(255,255,255,.15);}
+.demo-reset{background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.65);padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .15s;}
+.demo-reset:hover{background:rgba(255,255,255,.1);color:#fff;}
+
+/* ── SPINNERS ── */
+@keyframes spin{to{transform:rotate(360deg);}}
+.spinner{width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+.spinner-dark{border-color:rgba(0,0,0,.15);border-top-color:var(--gray-600);}
+
+/* ── CARD POP ── */
+@keyframes cardPop{0%{opacity:.7;transform:scale(.98);}100%{opacity:1;transform:scale(1);}}
+.card-pop{animation:cardPop .3s ease-out;}
+
+/* ── UTILITY ── */
+.is-hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">D</div>
+    <span class="logo-text">DripJobs</span>
+  </div>
+  <div class="sidebar-section">Main</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Appointments <span class="sidebar-badge">11</span></div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat <span class="sidebar-badge">3</span></div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tasks</div>
+  <div class="sidebar-section">Work</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Proposals</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>Jobs</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Invoices</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Job Costing</div>
+  <div class="sidebar-section">Growth</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Drips</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Blast</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</div>
+  <div class="sidebar-section">Account</div>
+  <div class="sidebar-item"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Company</div>
+  <div class="sidebar-item active"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</div>
+</aside>
+
+<!-- ═══════ MAIN ═══════ -->
+<div class="main">
+  <nav class="topnav">
+    <div class="topnav-tab">Company Info</div>
+    <div class="topnav-tab">Brand</div>
+    <div class="topnav-tab">Email Settings</div>
+    <div class="topnav-tab">App Settings</div>
+    <div class="topnav-tab">Calendar</div>
+    <div class="topnav-tab">Templates</div>
+    <div class="topnav-tab">Notifications</div>
+    <div class="topnav-tab">Payments</div>
+    <div class="topnav-tab">Integrations</div>
+    <div class="topnav-tab">Customer Portal</div>
+    <div class="topnav-tab active">Add-Ons</div>
+  </nav>
+
+  <div class="page-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Add-Ons</div>
+        <div class="page-subtitle">Manage features included in your plan. Enabling or disabling won&#8217;t affect your billing.</div>
+      </div>
+      <div class="plan-badge plan-badge-growth" id="planBadge">
+        <svg width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span id="planBadgeText">Growth Plan</span>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-container">
+      <div class="progress-label">Add-Ons Active</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-count" id="progressCount"></div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid">
+
+      <!-- SMS / Text Messaging -->
+      <div class="addon-card" id="card-sms">
+        <div class="card-ribbon" id="ribbon-sms"></div>
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#EDE9FE"/>
+            <!-- Phone body -->
+            <rect x="14" y="10" width="12" height="20" rx="2.5" stroke="#7C3AED" stroke-width="1.8" fill="#DDD6FE"/>
+            <rect x="16" y="13" width="8" height="5" rx="1" fill="#7C3AED" opacity=".35"/>
+            <circle cx="20" cy="27" r="1.2" fill="#7C3AED"/>
+            <!-- Message bubble overlapping top-right -->
+            <rect x="21" y="8" width="12" height="9" rx="2" fill="#7C3AED"/>
+            <path d="M23 24l2 3h-3z" fill="#7C3AED" transform="translate(2,-5)"/>
+            <line x1="23.5" y1="11" x2="30.5" y2="11" stroke="#EDE9FE" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="23.5" y1="13.5" x2="28.5" y2="13.5" stroke="#EDE9FE" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Text Messaging</div>
+            <div class="card-subtitle">Two-Way SMS Communication</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-description">Send as many texts as needed to keep customers informed — appointment reminders, job updates, and automatic follow-ups. We handle number registration and carrier setup.</p>
+        </div>
+        <div class="card-footer">
+          <div class="cost-row">
+            <span class="cost-label">Monthly cost</span>
+            <span class="price-amount" id="price-sms">$0</span>
+            <span class="price-unit">/ mo</span>
+            <span class="included-badge" id="badge-sms">&#10003; Included</span>
+          </div>
+          <div class="billing-note" id="billing-sms">Enabling or disabling won&#8217;t affect your billing.</div>
+          <div class="lock-msg is-hidden" id="lock-sms">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            This add-on is included in your monthly plan and cannot be removed.
+          </div>
+          <button type="button" class="btn btn-enable" id="btn-sms" onclick="toggleAddon('sms')">Enable Text Messaging</button>
+          <a class="card-learn-more" onclick="openModal('sms')">Learn more &#8594;</a>
+        </div>
+      </div>
+
+      <!-- Production Rates -->
+      <div class="addon-card" id="card-production">
+        <div class="card-ribbon" id="ribbon-production"></div>
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#EDE9FE"/>
+            <!-- Calculator body -->
+            <rect x="10" y="10" width="17" height="22" rx="2.5" stroke="#7C3AED" stroke-width="1.8" fill="#DDD6FE"/>
+            <rect x="12.5" y="13" width="12" height="4" rx="1" fill="#7C3AED" opacity=".4"/>
+            <rect x="12.5" y="19.5" width="3.5" height="3" rx=".8" fill="#7C3AED"/>
+            <rect x="17.5" y="19.5" width="3.5" height="3" rx=".8" fill="#7C3AED"/>
+            <rect x="12.5" y="24" width="3.5" height="3" rx=".8" fill="#7C3AED"/>
+            <rect x="17.5" y="24" width="3.5" height="3" rx=".8" fill="#7C3AED"/>
+            <!-- Gear overlapping bottom-right -->
+            <circle cx="31" cy="31" r="7" fill="#EDE9FE" stroke="#7C3AED" stroke-width="1.8"/>
+            <circle cx="31" cy="31" r="3" fill="#7C3AED"/>
+            <rect x="30.2" y="23.5" width="1.6" height="3" rx=".5" fill="#7C3AED"/>
+            <rect x="30.2" y="35.5" width="1.6" height="3" rx=".5" fill="#7C3AED"/>
+            <rect x="23.5" y="30.2" width="3" height="1.6" rx=".5" fill="#7C3AED"/>
+            <rect x="35.5" y="30.2" width="3" height="1.6" rx=".5" fill="#7C3AED"/>
+            <rect x="25.4" y="25.4" width="3" height="1.6" rx=".5" fill="#7C3AED" transform="rotate(45 26.9 26.2)"/>
+            <rect x="34.6" y="34.6" width="3" height="1.6" rx=".5" fill="#7C3AED" transform="rotate(45 36.1 35.4)"/>
+            <rect x="34.6" y="25.4" width="3" height="1.6" rx=".5" fill="#7C3AED" transform="rotate(-45 36.1 26.2)"/>
+            <rect x="25.4" y="34.6" width="3" height="1.6" rx=".5" fill="#7C3AED" transform="rotate(-45 26.9 35.4)"/>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Production Rates</div>
+            <div class="card-subtitle">Accurate Labor &amp; Material Estimates</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-description">Helps you accurately estimate labor cost and materials for painting projects, so every quote is fast, consistent, and profitable.</p>
+        </div>
+        <div class="card-footer">
+          <div class="cost-row">
+            <span class="cost-label">Monthly cost</span>
+            <span class="price-amount" id="price-production">$99</span>
+            <span class="price-unit">/ mo</span>
+            <span class="included-badge is-hidden" id="badge-production">&#10003; Included</span>
+          </div>
+          <div class="billing-note" id="billing-production">Enabling or disabling won&#8217;t affect your billing.</div>
+          <div class="lock-msg is-hidden" id="lock-production">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            This add-on is included in your monthly plan and cannot be removed.
+          </div>
+          <button type="button" class="btn btn-disable" id="btn-production" onclick="toggleAddon('production')">Disable</button>
+          <a class="card-learn-more" onclick="openModal('production')">Learn more &#8594;</a>
+        </div>
+      </div>
+
+      <!-- Job Costing -->
+      <div class="addon-card" id="card-jobcosting">
+        <div class="card-ribbon" id="ribbon-jobcosting"></div>
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#EDE9FE"/>
+            <!-- Dollar circle -->
+            <circle cx="20" cy="21" r="10" stroke="#7C3AED" stroke-width="2" fill="#DDD6FE"/>
+            <path d="M20 14v14" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M17 16.5c0-1.1 1.3-2 3-2s3 .9 3 2-1.3 1.8-3 2-3 1-3 2.2 1.3 2.3 3 2.3 3-1 3-2" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+            <!-- Trend arrow bottom-right -->
+            <polyline points="27,30 31,24 35,27" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="33,24 36,24 36,27" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Job Costing</div>
+            <div class="card-subtitle">Track Expenses &amp; Profitability</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-description">Simplifies monitoring of labor and project expenses, facilitating seamless calculation of job profitability so you always know where you stand on every job.</p>
+        </div>
+        <div class="card-footer">
+          <div class="cost-row">
+            <span class="cost-label">Monthly cost</span>
+            <span class="price-amount" id="price-jobcosting">$0</span>
+            <span class="price-unit">/ mo</span>
+            <span class="included-badge" id="badge-jobcosting">&#10003; Included</span>
+          </div>
+          <div class="billing-note" id="billing-jobcosting">Enabling or disabling won&#8217;t affect your billing.</div>
+          <div class="lock-msg is-hidden" id="lock-jobcosting">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            This add-on is included in your monthly plan and cannot be removed.
+          </div>
+          <button type="button" class="btn btn-disable" id="btn-jobcosting" onclick="toggleAddon('jobcosting')">Disable</button>
+          <a class="card-learn-more" onclick="openModal('jobcosting')">Learn more &#8594;</a>
+        </div>
+      </div>
+
+      <!-- Jobi AI -->
+      <div class="addon-card" id="card-jobi">
+        <div class="card-ribbon" id="ribbon-jobi"></div>
+        <div class="card-header">
+          <div class="card-icon">
+            <svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect width="44" height="44" rx="10" fill="#EDE9FE"/>
+            <!-- Sync arrows (two arcs with arrowheads) -->
+            <!-- Top arc: left to right -->
+            <path d="M14 20 A9 9 0 0 1 30 16" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <polyline points="28,13 30,16 27,17.5" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <!-- Bottom arc: right to left -->
+            <path d="M30 24 A9 9 0 0 1 14 28" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <polyline points="16,31 14,28 17,26.5" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <!-- Sparkle/star in center -->
+            <line x1="22" y1="18.5" x2="22" y2="25.5" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="18.5" y1="22" x2="25.5" y2="22" stroke="#7C3AED" stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="19.8" y1="19.8" x2="24.2" y2="24.2" stroke="#7C3AED" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="24.2" y1="19.8" x2="19.8" y2="24.2" stroke="#7C3AED" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="card-title">Jobi AI</div>
+            <div class="card-subtitle">AI-Powered Deal Intelligence</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-description">Provides intelligent deal analysis, AI-crafted customer communications, and data-driven insights to help you close more jobs faster with less effort.</p>
+        </div>
+        <div class="card-footer">
+          <div class="cost-row">
+            <span class="cost-label">Monthly cost</span>
+            <span class="price-amount" id="price-jobi">$39</span>
+            <span class="price-unit">/ mo</span>
+            <span class="included-badge is-hidden" id="badge-jobi">&#10003; Included</span>
+          </div>
+          <div class="billing-note" id="billing-jobi">Enabling or disabling won&#8217;t affect your billing.</div>
+          <div class="lock-msg is-hidden" id="lock-jobi">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            This add-on is included in your monthly plan and cannot be removed.
+          </div>
+          <button type="button" class="btn btn-enable" id="btn-jobi" onclick="toggleAddon('jobi')">Enable Jobi AI</button>
+          <a class="card-learn-more" onclick="openModal('jobi')">Learn more &#8594;</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TOAST ═══════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════ MODAL ═══════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button type="button" class="modal-close-btn" aria-label="Close modal" onclick="closeModal()">&#10005; Close</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-what-label">What it does:</p>
+      <p class="modal-description" id="modalDesc"></p>
+      <div class="modal-cost-box" id="modalCostBox">
+        <div class="modal-cost-icon">&#128176;</div>
+        <div>
+          <div class="modal-cost-value" id="modalCostValue">Cost: $0 / mo</div>
+          <div class="modal-cost-note" id="modalCostNote">Included with your Growth Plan. Enabling or disabling this add-on will <strong>not</strong> affect your billing in either direction.</div>
+        </div>
+      </div>
+      <div class="modal-setup-box is-hidden" id="modalSetupBox">
+        <div>
+          <div class="modal-setup-title">&#9881;&#65039; Setup Required</div>
+          <div class="modal-setup-text" id="modalSetupText"></div>
+        </div>
+      </div>
+      <div class="modal-lock-box is-hidden" id="modalLockBox">
+        <div>
+          <div class="modal-lock-title">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Included in Your Plan
+          </div>
+          <div class="modal-lock-text" id="modalLockText">This add-on is part of your monthly plan. It cannot be removed while you are subscribed.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="modal-btn modal-btn-close" onclick="closeModal()">Close</button>
+      <button type="button" class="modal-btn" id="modalActionBtn" aria-label="Toggle add-on" onclick="modalAction()"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ DEMO BAR ═══════ -->
+<div class="demo-bar">
+  <div class="demo-left">
+    <span class="demo-label">Demo</span>
+    <span class="demo-plan-label">View as:</span>
+    <div class="plan-switcher">
+      <button type="button" class="plan-btn active-growth" id="planBtn-growth" onclick="switchPlan('growth')">&#11088; Growth $197/mo</button>
+      <button type="button" class="plan-btn" id="planBtn-scale" onclick="switchPlan('scale')">&#11088; Scale $297/mo</button>
+      <button type="button" class="plan-btn" id="planBtn-advanced" onclick="switchPlan('advanced')">Advanced $147/mo (Legacy)</button>
+    </div>
+  </div>
+  <div class="demo-right">
+    <div class="demo-divider"></div>
+    <button type="button" class="demo-reset" onclick="resetPlan()">&#8635; Reset Plan</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// ADDON DEFINITIONS
+// ─────────────────────────────────────────────
+const ADDONS = {
+  sms: {
+    name: 'Text Messaging',
+    description: 'Send as many texts as needed to keep customers informed — appointment reminders, job updates, and automatic follow-ups. We handle number registration and carrier setup.',
+    setupRequired: true,
+    setupText: 'Your number needs to be registered with carriers. This takes about 2 minutes.'
+  },
+  production: {
+    name: 'Production Rates',
+    description: 'Helps you accurately estimate labor cost and materials for painting projects, so every quote is fast, consistent, and profitable.',
+    setupRequired: false,
+    setupText: ''
+  },
+  jobcosting: {
+    name: 'Job Costing',
+    description: 'Simplifies monitoring of labor and project expenses, facilitating seamless calculation of job profitability so you always know where you stand on every job.',
+    setupRequired: false,
+    setupText: ''
+  },
+  jobi: {
+    name: 'Jobi AI',
+    description: 'Provides intelligent deal analysis, AI-crafted customer communications, and data-driven insights to help you close more jobs faster with less effort.',
+    setupRequired: false,
+    setupText: ''
+  }
+};
+
+const ALL_IDS = ['sms', 'production', 'jobcosting', 'jobi'];
+
+// ─────────────────────────────────────────────
+// PLAN CONFIG  (BR-5, BR-6, BR-9)
+// ─────────────────────────────────────────────
+const PLAN_CONFIG = {
+  growth: {
+    label: 'Growth Plan',
+    badgeClass: 'plan-badge-growth',
+    btnClass: 'active-growth',
+    // add-ons bundled at $0; the rest are standard-priced
+    included: ['sms', 'jobcosting'],
+    prices: { sms: '$0', production: '$99', jobcosting: '$0', jobi: '$39' }
+  },
+  scale: {
+    label: 'Scale Plan',
+    badgeClass: 'plan-badge-scale',
+    btnClass: 'active-scale',
+    included: ['sms', 'production', 'jobcosting', 'jobi'],
+    prices: { sms: '$0', production: '$0', jobcosting: '$0', jobi: '$0' }
+  },
+  advanced: {
+    label: 'Advanced Plan (Legacy)',
+    badgeClass: 'plan-badge-advanced',
+    btnClass: 'active-advanced',
+    included: [],   // no bundled add-ons — all standard pricing
+    prices: { sms: '$25', production: '$99', jobcosting: '$49', jobi: '$39' }
+  }
+};
+
+// Default add-on states per plan
+// true = active, false = disabled, 'setup' = included but needs setup
+const PLAN_DEFAULTS = {
+  growth:   { sms: 'setup', production: false, jobcosting: true, jobi: false },
+  scale:    { sms: true,    production: true,  jobcosting: true, jobi: true  },
+  advanced: { sms: true,    production: false, jobcosting: true, jobi: false }
+};
+
+// ─────────────────────────────────────────────
+// RUNTIME STATE
+// ─────────────────────────────────────────────
+let currentPlan = 'growth';
+let STATE = Object.assign({}, PLAN_DEFAULTS.growth);
+let currentModalAddon = null;
+
+// ─────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────
+function isIncluded(id) {
+  return PLAN_CONFIG[currentPlan].included.includes(id);
+}
+
+function isLocked(id) {
+  return isIncluded(id) && STATE[id] === true;
+}
+
+// ─────────────────────────────────────────────
+// PLAN SWITCHER
+// ─────────────────────────────────────────────
+function switchPlan(planId) {
+  currentPlan = planId;
+  // Load default states for this plan
+  STATE = Object.assign({}, PLAN_DEFAULTS[planId]);
+
+  // Update plan badge
+  const cfg = PLAN_CONFIG[planId];
+  const badge = document.getElementById('planBadge');
+  badge.className = 'plan-badge ' + cfg.badgeClass;
+  document.getElementById('planBadgeText').textContent = cfg.label;
+
+  // Update plan switcher buttons
+  ALL_IDS.forEach(() => {}); // no-op — just need the plan btn loop
+  ['growth','scale','advanced'].forEach(p => {
+    const btn = document.getElementById('planBtn-' + p);
+    btn.className = 'plan-btn' + (p === planId ? ' ' + PLAN_CONFIG[p].btnClass : '');
+  });
+
+  // Re-render all cards
+  ALL_IDS.forEach(renderCard);
+  updateProgress();
+}
+
+function resetPlan() {
+  STATE = Object.assign({}, PLAN_DEFAULTS[currentPlan]);
+  ALL_IDS.forEach(renderCard);
+  updateProgress();
+  showToast('Reset to default ' + PLAN_CONFIG[currentPlan].label + ' state.', 'info');
+}
+
+// ─────────────────────────────────────────────
+// PROGRESS
+// ─────────────────────────────────────────────
+function updateProgress() {
+  const total  = ALL_IDS.length;
+  const active = ALL_IDS.filter(id => STATE[id] === true).length;
+  document.getElementById('progressFill').style.width = ((active / total) * 100) + '%';
+  document.getElementById('progressCount').textContent = active + ' of ' + total + ' active';
+}
+
+// ─────────────────────────────────────────────
+// CARD RENDER
+// ─────────────────────────────────────────────
+function renderCard(id) {
+  const state   = STATE[id];
+  const card    = document.getElementById('card-' + id);
+  const ribbon  = document.getElementById('ribbon-' + id);
+  const btn     = document.getElementById('btn-' + id);
+  const locked  = isLocked(id);
+  const included = isIncluded(id);
+
+  // Price
+  const price = PLAN_CONFIG[currentPlan].prices[id];
+  document.getElementById('price-' + id).textContent = price;
+
+  // Included badge visibility
+  const badge = document.getElementById('badge-' + id);
+  if (included) badge.classList.remove('is-hidden');
+  else badge.classList.add('is-hidden');
+
+  // Lock message vs billing note
+  const lockEl    = document.getElementById('lock-' + id);
+  const billingEl = document.getElementById('billing-' + id);
+  if (locked) {
+    lockEl.classList.remove('is-hidden');
+    billingEl.classList.add('is-hidden');
+    btn.classList.add('is-hidden');
+  } else {
+    lockEl.classList.add('is-hidden');
+    billingEl.classList.remove('is-hidden');
+    btn.classList.remove('is-hidden');
+  }
+
+  // Card state + ribbon + button
+  card.classList.remove('state-active','state-setup','state-disabled','card-pop');
+  void card.offsetWidth;
+
+  if (state === true) {
+    card.classList.add('state-active','card-pop');
+    ribbon.className = 'card-ribbon ribbon-active';
+    ribbon.innerHTML = '&#10003; Active';
+    if (!locked) {
+      btn.className = 'btn btn-disable';
+      btn.textContent = 'Disable';
+      btn.disabled = false;
+    }
+  } else if (state === 'setup') {
+    card.classList.add('state-setup','card-pop');
+    ribbon.className = 'card-ribbon ribbon-setup';
+    ribbon.textContent = 'Setup Required';
+    btn.className = 'btn btn-enable';
+    btn.textContent = 'Enable ' + ADDONS[id].name;
+    btn.disabled = false;
+  } else {
+    card.classList.add('state-disabled','card-pop');
+    ribbon.className = 'card-ribbon ribbon-disabled';
+    ribbon.textContent = 'Disabled';
+    btn.className = 'btn btn-enable';
+    btn.textContent = 'Enable ' + ADDONS[id].name;
+    btn.disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────────
+// TOGGLE
+// ─────────────────────────────────────────────
+function toggleAddon(id) {
+  if (isLocked(id)) {
+    showToast('This add-on is included in your plan and cannot be removed.', 'warning');
+    return;
+  }
+
+  const btn     = document.getElementById('btn-' + id);
+  const current = STATE[id];
+  const name    = ADDONS[id].name;
+
+  btn.disabled = true;
+  const spinner = document.createElement('div');
+  spinner.className = current === true ? 'spinner spinner-dark' : 'spinner';
+  btn.innerHTML = '';
+  btn.appendChild(spinner);
+  const lbl = document.createElement('span');
+  lbl.textContent = current === true ? 'Disabling...' : 'Enabling...';
+  btn.appendChild(lbl);
+
+  setTimeout(() => {
+    if (current === true) {
+      STATE[id] = false;
+      showToast(name + ' disabled.', 'info');
+    } else {
+      STATE[id] = true;
+      showToast(name + ' is now active!', 'success');
+    }
+    renderCard(id);
+    updateProgress();
+    if (currentModalAddon === id) { closeModal(); setTimeout(() => openModal(id), 300); }
+  }, 900);
+}
+
+// ─────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────
+function openModal(id) {
+  currentModalAddon = id;
+  const addon    = ADDONS[id];
+  const state    = STATE[id];
+  const included = isIncluded(id);
+  const locked   = isLocked(id);
+  const price    = PLAN_CONFIG[currentPlan].prices[id];
+  const planName = PLAN_CONFIG[currentPlan].label;
+
+  document.getElementById('modalTitle').textContent = addon.name;
+  document.getElementById('modalDesc').textContent  = addon.description;
+
+  // Cost box
+  if (included) {
+    document.getElementById('modalCostValue').textContent = 'Cost: $0 / mo';
+    document.getElementById('modalCostNote').innerHTML =
+      'Included with your ' + planName + '. Enabling or disabling this add-on will <strong>not</strong> affect your billing in either direction.';
+  } else {
+    document.getElementById('modalCostValue').textContent = 'Cost: ' + price + ' / mo';
+    document.getElementById('modalCostNote').innerHTML =
+      'This add-on is billed separately at <strong>' + price + '/mo</strong>. Enabling or disabling it will update your billing accordingly.';
+  }
+
+  // Setup box
+  const setupBox = document.getElementById('modalSetupBox');
+  if (addon.setupRequired && state !== true) {
+    setupBox.classList.remove('is-hidden');
+    document.getElementById('modalSetupText').textContent = addon.setupText;
+  } else {
+    setupBox.classList.add('is-hidden');
+  }
+
+  // Lock box
+  const lockBox = document.getElementById('modalLockBox');
+  if (locked) {
+    lockBox.classList.remove('is-hidden');
+    document.getElementById('modalLockText').textContent =
+      'This add-on is part of your ' + planName + '. It cannot be removed while you are subscribed to this plan.';
+  } else {
+    lockBox.classList.add('is-hidden');
+  }
+
+  // Action button
+  const actionBtn = document.getElementById('modalActionBtn');
+  if (locked) {
+    actionBtn.textContent = 'Cannot Remove';
+    actionBtn.setAttribute('aria-label', 'Cannot remove this add-on');
+    actionBtn.className = 'modal-btn modal-btn-locked';
+  } else if (state === true) {
+    actionBtn.textContent = 'Disable ' + addon.name;
+    actionBtn.setAttribute('aria-label', 'Disable ' + addon.name);
+    actionBtn.className = 'modal-btn modal-btn-disable';
+  } else {
+    actionBtn.textContent = 'Enable ' + addon.name;
+    actionBtn.setAttribute('aria-label', 'Enable ' + addon.name);
+    actionBtn.className = 'modal-btn modal-btn-enable';
+  }
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  currentModalAddon = null;
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function modalAction() {
+  const id = currentModalAddon;
+  if (!id || isLocked(id)) return;
+  closeModal();
+  setTimeout(() => toggleAddon(id), 150);
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+function showToast(message, type) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  const dot = document.createElement('div');
+  dot.className = 'toast-dot ' + (type || 'success');
+  toast.appendChild(dot);
+  toast.appendChild(document.createTextNode(message));
+  container.appendChild(toast);
+  requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('show')));
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 350); }, 3500);
+}
+
+// ─────────────────────────────────────────────
+// KEYBOARD
+// ─────────────────────────────────────────────
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+switchPlan('growth');
+</script>
+</body>
+</html>
